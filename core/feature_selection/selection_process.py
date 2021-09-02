@@ -1,4 +1,12 @@
-class FeatureUpliftSelection:
+import pandas as pd
+import numpy as np
+from typing import List, Callable
+from sklearn import base
+from sklearn.inspection import permutation_importance
+
+
+class AMGFeatureSelection:
+    # TODO Refactoring
     def __init__(self, model: BaseEstimator,
                  features: List[str], target: str, train_set_name: str, valid_set_name: str,
                  scorer_function: Callable, n_feature_batch: int, min_uplift: float, n_min_feature: int,
@@ -21,7 +29,7 @@ class FeatureUpliftSelection:
         """
         self.model = base.clone(model)
         self.features = features
-        http://self.target = target
+        self.target = target
         self.scorer_function = scorer_function
         self.n_feature_batch = n_feature_batch
         self.min_uplift = min_uplift
@@ -89,31 +97,31 @@ class FeatureUpliftSelection:
 
         #### Specially for LightGBM model, metric greater - better
         if isinstance(self.model, lgbm.sklearn.LGBMClassifier):
-            estimator = http://self.model.fit(X=df.loc[self.train_indx, shorted_features],
-                           y=df.loc[self.train_indx, http://self.target],
+            estimator = self.model.fit(X=df.loc[self.train_indx, shorted_features],
+                           y=df.loc[self.train_indx, self.target],
                            eval_metric=self.model.metric,
                            eval_set=[(df.loc[self.valid_indx, shorted_features],
-                                      df.loc[self.valid_indx, http://self.target])],
+                                      df.loc[self.valid_indx, self.target])],
                            eval_names=['valid'], verbose=False)
             score = np.max(estimator.evals_result_['valid'][self.model.metric])
 
         #### Specially for LightGBM model, metric less - better
         elif isinstance(self.model, lgbm.sklearn.LGBMRegressor):
-            estimator = http://self.model.fit(X=df.loc[self.train_indx, shorted_features],
-                                       y=df.loc[self.train_indx, http://self.target],
+            estimator = self.model.fit(X=df.loc[self.train_indx, shorted_features],
+                                       y=df.loc[self.train_indx, self.target],
                                        eval_metric=self.model.metric,
                                        eval_set=[(df.loc[self.valid_indx, shorted_features],
-                                                  df.loc[self.valid_indx, http://self.target])],
+                                                  df.loc[self.valid_indx, self.target])],
                                        eval_names=['valid'], verbose=False)
             score = np.min(estimator.evals_result_['valid'][self.model.metric])
         else:
         #### For Rest cases
-            estimator = http://self.model.fit(df.loc[self.train_indx, shorted_features],
-                                       df.loc[self.train_indx, http://self.target])
+            estimator = self.model.fit(df.loc[self.train_indx, shorted_features],
+                                       df.loc[self.train_indx, self.target])
 
             score = self.scorer_function(estimator,
                                          df.loc[self.valid_indx, shorted_features],
-                                         df.loc[self.valid_indx, http://self.target])
+                                         df.loc[self.valid_indx, self.target])
 
         return {"feature": feature_to_exclude, "score": score, "model": estimator}
 
@@ -136,7 +144,7 @@ class FeatureUpliftSelection:
         if enable_permutation:
             resulted_features = self._permutaion_importance(model=res['model'],
                                                             X=df.loc[self.valid_indx, resulted_features],
-                                                            y=df.loc[self.valid_indx, http://self.target],
+                                                            y=df.loc[self.valid_indx, self.target],
                                                             n_repeats=2)
         return list(resulted_features), score_base
 
@@ -146,18 +154,18 @@ class FeatureUpliftSelection:
         self.train_indx = df[df["__SET__"] == self.train_set_name].index
         self.valid_indx = df[df["__SET__"] == self.valid_set_name].index
 
-        original_estimator = http: // self.model.fit(df.loc[self.train_indx, self.features],
-                                                     df.loc[self.train_indx, http: // self.target])
+        original_estimator = self.model.fit(df.loc[self.train_indx, self.features],
+                                                     df.loc[self.train_indx, self.target])
 
         score_base = self.scorer_function(original_estimator,
                                           df.loc[self.valid_indx, self.features],
-                                          df.loc[self.valid_indx, http: // self.target])
+                                          df.loc[self.valid_indx, self.target])
 
         # Sorted features from lower to higher values of importances
         self.resulted_features = self._permutaion_importance(model=original_estimator,
                                                              X=df.loc[self.valid_indx, self.features],
-                                                             y=df.loc[self.valid_indx, http: // self.target],
-        n_repeats = 1)
+                                                             y=df.loc[self.valid_indx, self.target],
+                                                             n_repeats = 1)
         if self.verbose:
             print("Base model fitted")
 
@@ -211,3 +219,15 @@ class FeatureUpliftSelection:
             print('Process finished')
 
         return self
+
+
+class SMGFeatureSelection:
+    # TODO Statistical metric gain feature selection
+    def __init__(self):
+        pass
+
+
+class PSIFeatureSelection:
+    # TODO perform PSI calculation over all given features
+    def __init__(self):
+        pass
