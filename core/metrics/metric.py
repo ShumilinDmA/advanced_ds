@@ -86,10 +86,10 @@ def expected_calibration_error(y_true: np.array, y_pred: np.array, bins: int = 1
         mask = bin_belongings == bin_number
         y_pred_bin = y_pred[mask].mean()
         y_true_bin = y_true[mask].mean()
-        error = abs(y_true_bin - y_pred_bin)
+        error = abs(y_true_bin - y_pred_bin) * np.sum(mask)
         per_bin_errors.append(error)
 
-    return np.mean(per_bin_errors)
+    return np.sum(per_bin_errors) / len(y_true)
 
 
 def adaptive_expected_calibration_error(y_true: np.array, y_pred: np.array, bins: int = 10) -> float:
@@ -113,10 +113,10 @@ def adaptive_expected_calibration_error(y_true: np.array, y_pred: np.array, bins
         mask = bin_belongings == bin_number
         y_pred_bin = y_pred[mask].mean()
         y_true_bin = y_true[mask].mean()
-        error = abs(y_true_bin - y_pred_bin)
+        error = abs(y_true_bin - y_pred_bin) * np.sum(mask)
         per_bin_errors.append(error)
 
-    return np.mean(per_bin_errors)
+    return np.sum(per_bin_errors) / len(y_true)
 
 
 # ===================== Auxiliary metrics ===================== #
@@ -131,7 +131,7 @@ def mean_error(y_true: np.array, y_pred: np.array) -> float:
     return y_true.mean() - y_pred.mean()
 
 
-def psi(current_data: np.array, expected_data: np.array, bins: int, used_nan: Optional = None) -> float:
+def psi_score(current_data: np.array, expected_data: np.array, bins: int, used_nan: Optional = None) -> float:
     """
     Compute population stability index over current data and expected data
     :param current_data: Data in current experiment
@@ -182,6 +182,23 @@ def psi(current_data: np.array, expected_data: np.array, bins: int, used_nan: Op
     expected_bins = fill_zeros(expected_bins)
 
     psi_bins = (current_bins - expected_bins) * np.log(current_bins / expected_bins)
-    psi_score = psi_bins.sum()
+    psi = psi_bins.sum()
 
-    return psi_score
+    return psi
+
+
+def vif_score(y_true: np.array, y_pred: np.array) -> float:
+    """
+    Variance inflation factor to estimate multicollinearity in features.
+     If vif ~ 1 - there is no multicollinearity
+     If vif ~ 5 - there is weakly multicollinearity
+     If vif > 5+ - there is strong multicollinearity
+    :param y_true: True data
+    :param y_pred: Predicted value
+    :return: VIF score for feature
+    """
+    vif = 1 / (1 - r2_score(y_true, y_pred) ** 2)
+    return vif
+
+
+# TODO maybe information value (IV), maybe Cramer V coefficient

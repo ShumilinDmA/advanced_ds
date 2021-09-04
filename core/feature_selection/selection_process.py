@@ -231,3 +231,9 @@ class PSIFeatureSelection:
     # TODO perform PSI calculation over all given features
     def __init__(self):
         pass
+
+
+class VIFFeatureSelection:
+    def __init__(self) -> None:
+        # TODO VIF selector
+        pass
