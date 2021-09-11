@@ -1,5 +1,5 @@
 import pandas as pd
-from metric import *
+from metrics import *
 
 
 # ===================== Classification metric wrappers ===================== #

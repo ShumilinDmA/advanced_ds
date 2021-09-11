@@ -5,7 +5,7 @@ from sklearn.metrics import roc_auc_score, r2_score, precision_recall_curve, auc
 
 # ===================== Classification metrics ===================== #
 
-def gini_score(y_true: np.array, y_pred: np.array) -> float:
+def gini_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Get gini coefficient
     :param y_true: True targets
@@ -15,7 +15,7 @@ def gini_score(y_true: np.array, y_pred: np.array) -> float:
     return 2 * roc_auc_score(y_true, y_pred) - 1
 
 
-def pr_auc_score(y_true: np.array, y_pred: np.array) -> float:
+def pr_auc_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Return area under precision recall curve
     :param y_true: Targets for binary classification task
@@ -29,7 +29,7 @@ def pr_auc_score(y_true: np.array, y_pred: np.array) -> float:
     return pr_auc
 
 
-def precision_at_recall_auc_score(y_true: np.array, y_pred: np.array, recall_threshold) -> float:
+def precision_at_recall_auc_score(y_true: np.ndarray, y_pred: np.ndarray, recall_threshold: float) -> float:
     """
     Area under precision recall curve with boundary condition under recall
     :param y_true: Targets for binary classification task
@@ -51,7 +51,7 @@ def precision_at_recall_auc_score(y_true: np.array, y_pred: np.array, recall_thr
 
 # ===================== Regression metrics ===================== #
 
-def adjusted_r2_score(y_true: np.array, y_pred: np.array, n_features: float) -> float:
+def adjusted_r2_score(y_true: np.ndarray, y_pred: np.ndarray, n_features: float) -> float:
     """
     Get adjusted r2 score for regression task.
     Wiki: Coefficient of determination
@@ -68,7 +68,7 @@ def adjusted_r2_score(y_true: np.array, y_pred: np.array, n_features: float) -> 
 
 # ===================== Calibration metrics ===================== #
 
-def expected_calibration_error(y_true: np.array, y_pred: np.array, bins: int = 10) -> float:
+def expected_calibration_error(y_true: np.ndarray, y_pred: np.ndarray, bins: int = 10) -> float:
     """
     Compute expected calibration error for binary classification task using histogram
     :param y_true: Targets
@@ -92,7 +92,7 @@ def expected_calibration_error(y_true: np.array, y_pred: np.array, bins: int = 1
     return np.sum(per_bin_errors) / len(y_true)
 
 
-def adaptive_expected_calibration_error(y_true: np.array, y_pred: np.array, bins: int = 10) -> float:
+def adaptive_expected_calibration_error(y_true: np.ndarray, y_pred: np.ndarray, bins: int = 10) -> float:
     """
     Compute adaptive expected calibration error for binary classification task using bins of equal sizes
     :param y_true: Targets
@@ -121,7 +121,7 @@ def adaptive_expected_calibration_error(y_true: np.array, y_pred: np.array, bins
 
 # ===================== Auxiliary metrics ===================== #
 
-def mean_error(y_true: np.array, y_pred: np.array) -> float:
+def mean_error(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Difference in mean values between y_true and y_pred
     :param y_true: Target
@@ -131,7 +131,8 @@ def mean_error(y_true: np.array, y_pred: np.array) -> float:
     return y_true.mean() - y_pred.mean()
 
 
-def psi_score(current_data: np.array, expected_data: np.array, bins: int, used_nan: Optional = None) -> float:
+def psi_score(current_data: np.ndarray, expected_data: np.ndarray,
+              bins: int, used_nan: Optional[int, float, None] = None) -> float:
     """
     Compute population stability index over current data and expected data
     :param current_data: Data in current experiment
@@ -187,7 +188,7 @@ def psi_score(current_data: np.array, expected_data: np.array, bins: int, used_n
     return psi
 
 
-def vif_score(y_true: np.array, y_pred: np.array) -> float:
+def vif_score(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     Variance inflation factor to estimate multicollinearity in features.
      If vif ~ 1 - there is no multicollinearity
@@ -201,4 +202,6 @@ def vif_score(y_true: np.array, y_pred: np.array) -> float:
     return vif
 
 
-# TODO maybe information value (IV), maybe Cramer V coefficient
+def cramer_correlation(data):
+    # TODO Cramer correlation score
+    pass
