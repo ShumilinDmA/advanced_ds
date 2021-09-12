@@ -14,9 +14,11 @@ pr_auc_scorer = make_scorer(pr_auc_score, greater_is_better=True, needs_proba=Tr
 mean_error_scorer = make_scorer(mean_error, greater_is_better=False, needs_proba=False, needs_threshold=False)
 
 
-def adjusted_r2_scorer(estimator: Any, x: Union[pd.DataFrame, np.ndarray], y: Union[pd.Series, np.ndarray]) -> float:
+def adjusted_r2_scorer(estimator: Any, x: Union[pd.DataFrame, np.ndarray], y: Union[pd.Series, np.ndarray],
+                       **kwargs) -> float:
+
     y_pred = estimator.predict(x)
-    adjusted_r2 = adjusted_r2_score(y, y_pred, n_features=x.shape[1])
+    adjusted_r2 = adjusted_r2_score(y, y_pred, n_features=x.shape[1], **kwargs)
     return adjusted_r2
 
 
